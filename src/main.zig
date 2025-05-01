@@ -45,7 +45,7 @@ const FakeNeko = struct {
         for (0..max_length) |i| {
             if (node.*.count() == 0) {
                 if (i == 0) return output;
-                output = try allocator.realloc(output, i - 1);
+                output = try allocator.realloc(output, i);
                 return output;
             }
 
@@ -57,7 +57,7 @@ const FakeNeko = struct {
             const next_char = result.chars[next_char_index];
 
             if (next_char == 0) {
-                output = try allocator.realloc(output, i - 1);
+                output = try allocator.realloc(output, i);
                 return output;
             }
 
@@ -134,6 +134,8 @@ pub fn main() !void {
     var fneko = FakeNeko{
         .depth = 2,
     };
+
+    try fneko.record(allocator, "abcd");
 
     const text = try fneko.generate(allocator, 100);
     defer allocator.free(text);
