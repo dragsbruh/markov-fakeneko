@@ -135,7 +135,7 @@ pub const Modelfile = struct {
 
                 while (try walker.next()) |entry| {
                     if (entry.kind == .file) {
-                        const full_path = try dir.realpathAlloc(allocator, entry.basename);
+                        const full_path = try dir.realpathAlloc(allocator, entry.path);
                         try self.files.append(allocator, full_path);
                     }
                 }
