@@ -1,0 +1,11 @@
+.{
+    .depth = 8,
+    .train_throttle = 10_000,
+    .gen_throttle = 1_00_000,
+    .model_bin = "model.bin",
+    .train_buffer_size = 4096, // the more the size, the less effect train_throttle has
+    .files = .{
+        "data/lovecraft/",
+        // "data/algernon.txt",
+    },
+}

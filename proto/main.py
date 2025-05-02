@@ -56,48 +56,47 @@ def train(fn: FakeNeko, sentences: list[str]):
 
 def main():
     if len(sys.argv) < 3:
-        print("usage:", sys.argv[0], "<file>", "<depth>")
+        print("usage:", sys.argv[0], "<depth>", "[...files]")
         exit(1)
 
-    file_path = sys.argv[1]
-
-    if not os.path.exists(file_path):
-        print("error: file", file_path, "does not exist")
-        exit(1)
-
-    depth = sys.argv[2]
+    depth = sys.argv[1]
     try:
         depth = int(depth)
     except ValueError:
         print("error: provided depth is not a number")
         exit(1)
 
+    input_files = sys.argv[2:]
+    for file in input_files:
+        if not os.path.exists(file):
+            print("error: file", file, "does not exist")
+            exit(1)
+
     fn = FakeNeko(depth)
 
     global_start = time.time_ns()
     sample_times = []
-    with open(file_path, "r") as f:
-        lines = f.readlines()
-        for i, line in enumerate(lines, start=1):
-            start = time.time_ns()
-            fn.record(line)
-            print(
-                f"{i}/{len(lines)} training status {round((i/len(lines))*100, 2)}%", end='\r')
-            sample_times.append(time.time_ns()-start)
-            time.sleep(0.001)
-        print()
+    for file in input_files:
+        with open(file, "r") as f:
+            lines = f.readlines()
+            for i, line in enumerate(lines, start=1):
+                start = time.time_ns()
+                fn.record(line)
+                print(
+                    f"{i}/{len(lines)} training status {round((i/len(lines))*100, 2)}%", end='\r')
+                sample_times.append(time.time_ns()-start)
+                time.sleep(0.001)
+            print()
 
     duration = (time.time_ns()-global_start)/1_000_000_000
     iter_avg = (sum(sample_times)/len(sample_times))/1_000_000_000
     print("training complete in", duration,
           "seconds with each iteration averaging", iter_avg, "seconds")
 
-    with open("out.txt", "w") as txt:
-        for i, char in enumerate(fn.generate()):
-            txt.write(char)
-            sys.stdout.write(char)
-            if i % 6 == 0:
-                sys.stdout.flush()
+    for i, char in enumerate(fn.generate()):
+        sys.stdout.write(char)
+        if i % 6 == 0:
+            sys.stdout.flush()
     sys.stdout.flush()
 
 
